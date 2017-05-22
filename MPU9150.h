@@ -634,6 +634,9 @@ class MPU9150 {
         int16_t getAccelerationY();
         int16_t getAccelerationZ();
 
+        //Magnetomter resp. compass enable
+        void enableMag();
+
         // TEMP_OUT_* registers
         int16_t getTemperature();
 

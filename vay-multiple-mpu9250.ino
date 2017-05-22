@@ -29,33 +29,36 @@ THE SOFTWARE.
 ===============================================
 */
 
-
+// define SD Card Logger
+ #define Adalogger  // uncomment this to remove this
 // SD Card Logger Init
 //---------------------------------------------
 
-#include <SPI.h>
-#include <SD.h>
+#ifdef Adalogger
 
-// Set the pins used
-#define cardSelect 4
+  #include <SPI.h>
+  #include <SD.h>
+  
+  // Set the pins used
+  #define cardSelect 4
 
-File logfile;
-// blink out an error code
-void error(uint8_t errno) {
-  while(1) {
-    uint8_t i;
-    for (i=0; i<errno; i++) {
-      digitalWrite(13, HIGH);
-      delay(100);
-      digitalWrite(13, LOW);
-      delay(100);
-    }
-    for (i=errno; i<10; i++) {
-      delay(200);
+  File logfile;
+  // blink out an error code
+  void error(uint8_t errno) {
+    while(1) {
+      uint8_t i;
+      for (i=0; i<errno; i++) {
+        digitalWrite(13, HIGH);
+        delay(100);
+        digitalWrite(13, LOW);
+        delay(100);
+      }
+      for (i=errno; i<10; i++) {
+        delay(200);
+      }
     }
   }
-}
-
+#endif
 
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
@@ -81,6 +84,7 @@ int16_t mx, my, mz;
 // i2xmux init
 #define MPU_addr 0x68
 #define TCAADDR 0x70
+
 int sensorNumber = 5;
 void tcaselect(uint8_t i) {
   if (i > 7) return; 
@@ -101,7 +105,7 @@ delay(2000);
   Serial.println("\r\nAnalog logger test");
   pinMode(13, OUTPUT);
 
-
+#ifdef Adalogger
   // see if the card is present and can be initialized:
   if (!SD.begin(cardSelect)) {
     Serial.println("Card init. failed!");
@@ -130,18 +134,19 @@ delay(2000);
   pinMode(13, OUTPUT);
   pinMode(8, OUTPUT);
   Serial.println("Ready!");
-  
+#endif
     // join I2C bus (I2Cdev library doesn't do this automatically)
     Wire.begin();
-for(int x = 0; x < sensorNumber; x++)
-{
-      tcaselect(x); // make a loop for all sensors here!
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x6B);  // PWR_MGMT_1 register
-  Wire.write(0);     // set to zero (wakes up the MPU-6050)
-  Wire.endTransmission(true);
-}
-
+    for(int x = 0; x < sensorNumber; x++)
+    {
+          tcaselect(x); // make a loop for all sensors here!
+      Wire.beginTransmission(MPU_addr);
+      Wire.write(0x6B);  // PWR_MGMT_1 register
+      Wire.write(0);     // set to zero (wakes up the MPU-6050)
+      Wire.endTransmission(true);
+      accelGyroMag.enableMag();
+    }
+  
     // initialize device
     Serial.println("Initializing I2C devices...");
     accelGyroMag.initialize();
@@ -152,6 +157,7 @@ for(int x = 0; x < sensorNumber; x++)
 
     // configure Arduino LED for
     pinMode(LED_PIN, OUTPUT);
+
 }
 
 uint8_t i=0; // reset for SD Card logging
@@ -162,12 +168,12 @@ void loop() {
    {
     tcaselect(t);
     // read raw accel/gyro/mag measurements from device
-    accelGyroMag.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);  // or     accelGyroMag.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
-    // these methods (and a few others) are also available
+    accelGyroMag.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);  // or     accelGyroMag.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
+    //these methods (and a few others) are also available
     //accelGyroMag.getAcceleration(&ax, &ay, &az);
     //accelGyroMag.getRotation(&gx, &gy, &gz);
 
-
+#ifdef Adalogger
     // SD card logging
     digitalWrite(8, HIGH);
     logfile.print(ax); logfile.print(",");
@@ -176,11 +182,12 @@ void loop() {
     logfile.print(gx); logfile.print(",");
     logfile.print(gy); logfile.print(",");
     logfile.print(gz); logfile.print(",");
-/*    logfile.print(int(mx)); logfile.print(",");
+    logfile.print(int(mx)); logfile.print(",");
     logfile.print(int(my)); logfile.print(",");
     logfile.print(int(mz)); logfile.print(",");
-*/
+
     digitalWrite(8, LOW);
+  #endif
 
     
     // display tab-separated accel/gyro/mag x/y/z values
@@ -191,11 +198,10 @@ void loop() {
     Serial.print(gx); Serial.print("\t");
     Serial.print(gy); Serial.print("\t");
     Serial.print(gz); Serial.print("\t");
-    /*
     Serial.print(int(mx)); Serial.print("\t");
     Serial.print(int(my)); Serial.print("\t");
     Serial.print(int(mz)); Serial.print("\t");
-    */
+    
 
 /*
     const float N = 256;
@@ -210,9 +216,11 @@ void loop() {
    }
     Serial.print(millis());
     Serial.print("\n");
+#ifdef Adalogger
     logfile.print(millis());
     logfile.println(";");
     logfile.flush();
+   #endif
     
     // blink LED to indicate activity
     blinkState = !blinkState;
