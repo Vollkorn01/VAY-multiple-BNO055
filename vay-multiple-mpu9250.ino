@@ -28,6 +28,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
+// define Serial Output
+#define SerialPrint
 
 // define SD Card Logger
  #define Adalogger  // uncomment this to remove this
@@ -59,6 +61,11 @@ THE SOFTWARE.
     }
   }
 #endif
+int flushcount = 0;
+
+// Labeling Initialization
+String exercise = "Not Def";
+#define LED_PIN 13
 
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
@@ -102,6 +109,7 @@ delay(2000);
 //----------------------------------------------------------------------------------
 
   Serial.begin(115200);
+  Serial1.begin(9600);
   Serial.println("\r\nAnalog logger test");
   pinMode(13, OUTPUT);
 
@@ -164,6 +172,75 @@ uint8_t i=0; // reset for SD Card logging
 
 void loop() {
 
+// labeling with mobile app
+ int c;
+  if (Serial1.available()) {
+    c = Serial1.read();  
+    if (c == 3)
+    {
+      exercise = "Push Up";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 4)
+    {
+      exercise = "Sit Up";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 5)
+    {
+      exercise = "Plank";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 6)
+    {
+      exercise = "Plank Tap";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 7)
+    {
+      exercise = "Lunge";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 8)
+    {
+      exercise = "Squat";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 9)
+    {
+      exercise = "Squat Jump";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 10)
+    {
+      exercise = "Running";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 11)
+    {
+      exercise = "Walking";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 12)
+    {
+      exercise = "Sitting";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 13)
+    {
+      exercise = "Standing";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    else if (c == 14)
+    {
+      exercise = "No Class";
+      digitalWrite(LED_PIN, LOW);
+    }
+    else
+    {
+      digitalWrite(LED_PIN, LOW);
+    }  
+  }
  for (int t = 0; t < sensorNumber; t++)
    {
     tcaselect(t);
@@ -189,7 +266,7 @@ void loop() {
     digitalWrite(8, LOW);
   #endif
 
-    
+#ifdef SerialPrint
     // display tab-separated accel/gyro/mag x/y/z values
     Serial.print("a/g/m:\t");
     Serial.print(ax); Serial.print("\t");
@@ -201,6 +278,7 @@ void loop() {
     Serial.print(int(mx)); Serial.print("\t");
     Serial.print(int(my)); Serial.print("\t");
     Serial.print(int(mz)); Serial.print("\t");
+  #endif
     
 
 /*
@@ -214,12 +292,22 @@ void loop() {
         Serial.print("*"); 
         */
    }
-    Serial.print(millis());
-    Serial.print("\n");
+#ifdef SerialPrint
+    Serial.print(millis()); Serial.print(",");
+    Serial.print(exercise);
+    Serial.println(";");
+  #endif
+  
 #ifdef Adalogger
-    logfile.print(millis());
+    logfile.print(millis()); logfile.print(",");
+    logfile.print(exercise);
     logfile.println(";");
+    flushcount++;
+    if (flushcount >= 90)
+    {
     logfile.flush();
+    flushcount = 0;
+    }
    #endif
     
     // blink LED to indicate activity
