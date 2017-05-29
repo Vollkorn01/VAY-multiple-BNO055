@@ -41,7 +41,7 @@ Please note that you must use a HM-10 compatible module for this example to work
 			<img src="ui/images/arrow-left.svg" />
 		</button>
 
-		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+		<img class="logotype" src="ui/images/VAY-logo.svg" alt="VAY-logo" />
 
 		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
 	</header>
@@ -52,53 +52,53 @@ Please note that you must use a HM-10 compatible module for this example to work
 
 	<button class="green wide" onclick="app.connect()">CONNECT</button>
 
-	<br />
-
-	<button class="blue wide" onclick="app.pushUp()">PUSH UP</button>
-
-	<br />
-
-	<button class="blue wide" onclick="app.sitUp()">SIT UP</button>
+	<input type="radio" id="Label0" name="lightButton"
+		class="btn-group red wide" />
+	<label for="Label0" onclick="app.noClass()">0 NO CLASS</label>
 	
-	<br />
+	<input type="radio" id="Label1" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label1" onclick="app.pushUp()">1 PUSH UP</label>
 	
-	<button class="blue wide" onclick="app.plank()">PLANK</button>
+	<input type="radio" id="Label2" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label2" onclick="app.sitUp()">2 SIT UP</label>
 	
-	<br />
-
-	<button class="blue wide" onclick="app.plankTap()">PLANK TAP</button>
-
-	<br />
+	<input type="radio" id="Label3" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label3" onclick="app.plank()">3 PLANK</label>
 	
-	<button class="blue wide" onclick="app.lunge()">LUNGE</button>
+	<input type="radio" id="Label4" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label4" onclick="app.plankTap()">4 PLANK TAP</label>
 	
-	<br />
+	<input type="radio" id="Label5" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label5" onclick="app.lunge()">5 LUNGE</label>
 	
-	<button class="red wide" onclick="app.noClass()">NO CLASS</button>
-
-	<br />
-
-	<button class="blue wide" onclick="app.squat()">SQUAT</button>
+	<input type="radio" id="Label6" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label6" onclick="app.squat()">6 SQUAT</label>
 	
-	<br />
+	<input type="radio" id="Label7" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label7" onclick="app.squatJump()">7 SQUAT JUMP</label>
 	
-	<button class="blue wide" onclick="app.squatJump()">SQUAT JUMP</button>
+	<input type="radio" id="Label8" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label8" onclick="app.walking()">8 WALKING</label>
 	
-	<br />
+	<input type="radio" id="Label9" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label9" onclick="app.running()">9 RUNNING</label>
 	
-	<button class="blue wide" onclick="app.walking()">WALKING</button>
+	<input type="radio" id="Label10" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label10" onclick="app.sitting()">10 SITTING</label>
 	
-	<br />
-	
-	<button class="blue wide" onclick="app.running()">RUNNING</button>
-	
-	<br />
-	
-	<button class="blue wide" onclick="app.sitting()">SITTING</button>
-	
-	<br />
-	
-	<button class="blue wide" onclick="app.standing()">StANDING</button>
+	<input type="radio" id="Label11" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label11" onclick="app.standing()">11 STANDING</label>
 
 	<script>
 	// Application object.
@@ -107,76 +107,77 @@ Please note that you must use a HM-10 compatible module for this example to work
 	// Connected device.
 	app.device = null;
 
+	
+		// Track No CLASS.
+	app.noClass = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([0]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
 	// Track Push Ups.
 	app.pushUp = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([3]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([1]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Sit Up.
 	app.sitUp = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([4]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([2]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Plank.
 	app.plank = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([5]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([3]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Plank Tap.
 	app.plankTap = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([6]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([4]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Lunge.
 	app.lunge = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([7]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([5]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Squat.
 	app.squat = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([8]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([6]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Squat Jump.
 	app.squatJump = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([9]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([7]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Running.
 	app.running = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([10]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([8]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Walking
 	app.walking = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([11]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([9]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Sitting
 	app.sitting = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([12]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([10]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 		// Track Standing
 	app.standing = function()
 	{
-		app.device && app.device.writeDataArray(new Uint8Array([13]), '0000ffe1-0000-1000-8000-00805f9b34fb');
-	}
-	
-		// Track No CLASS.
-	app.noClass = function()
-	{
-		app.device && app.device.writeDataArray(new Uint8Array([14]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+		app.device && app.device.writeDataArray(new Uint8Array([11]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 

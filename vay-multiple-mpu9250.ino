@@ -29,12 +29,17 @@ THE SOFTWARE.
 ===============================================
 */
 // define Serial Output
-#define SerialPrint
+#define SerialPrint  // uncomment this to not print in serial monitor
 
-// define SD Card Logger
- #define Adalogger  // uncomment this to remove this
+// define Bool to start logging
+bool readData = false;
+
 // SD Card Logger Init
 //---------------------------------------------
+
+// define SD Card Logger
+ #define Adalogger  // uncomment this to not print on sd card
+
 
 #ifdef Adalogger
 
@@ -176,81 +181,104 @@ void loop() {
  int c;
   if (Serial1.available()) {
     c = Serial1.read();  
-
+    //Serial.print(c);
+    
+    if (c == 0)
+    {
+      exercise = "0";
+      digitalWrite(LED_PIN, HIGH);
+      readData = false;
+    }
     if (c == 1)
     {
       exercise = "1";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
-    if (c == 2)
+    else if (c == 2)
     {
       exercise = "2";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
-    if (c == 3)
+    else if (c == 3)
     {
       exercise = "3";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 4)
     {
       exercise = "4";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 5)
     {
       exercise = "5";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 6)
     {
       exercise = "6";
-      digitalWrite(LED_PIN, HIGH);
+      digitalWrite(LED_PIN, LOW);
+      readData = false;
     }
     else if (c == 7)
     {
       exercise = "7";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 8)
     {
       exercise = "8";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 9)
     {
       exercise = "9";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 10)
     {
       exercise = "10";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 11)
     {
       exercise = "11";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 12)
     {
       exercise = "12";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 13)
     {
       exercise = "13";
       digitalWrite(LED_PIN, HIGH);
+      readData = true;
     }
     else if (c == 14)
     {
       exercise = "14";
       digitalWrite(LED_PIN, LOW);
+      readData = true;
     }
+
     else
     {
       digitalWrite(LED_PIN, LOW);
     }  
+    
   }
  for (int t = 0; t < sensorNumber; t++)
    {
@@ -260,7 +288,8 @@ void loop() {
     //these methods (and a few others) are also available
     //accelGyroMag.getAcceleration(&ax, &ay, &az);
     //accelGyroMag.getRotation(&gx, &gy, &gz);
-
+if (readData)
+{
 #ifdef Adalogger
     // SD card logging
     digitalWrite(8, HIGH);
@@ -290,7 +319,7 @@ void loop() {
     Serial.print(int(my)); Serial.print("\t");
     Serial.print(int(mz)); Serial.print("\t");
   #endif
-    
+}
 
 /*
     const float N = 256;
@@ -303,6 +332,8 @@ void loop() {
         Serial.print("*"); 
         */
    }
+if (readData)
+{
 #ifdef SerialPrint
     Serial.print(millis()); Serial.print(",");
     Serial.print(exercise);
@@ -320,6 +351,7 @@ void loop() {
     flushcount = 0;
     }
    #endif
+}
     
     // blink LED to indicate activity
     blinkState = !blinkState;
