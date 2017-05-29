@@ -176,64 +176,75 @@ void loop() {
  int c;
   if (Serial1.available()) {
     c = Serial1.read();  
+
+    if (c == 1)
+    {
+      exercise = "1";
+      digitalWrite(LED_PIN, HIGH);
+    }
+    if (c == 2)
+    {
+      exercise = "2";
+      digitalWrite(LED_PIN, HIGH);
+    }
     if (c == 3)
     {
-      exercise = "Push Up";
+      exercise = "3";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 4)
     {
-      exercise = "Sit Up";
+      exercise = "4";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 5)
     {
-      exercise = "Plank";
+      exercise = "5";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 6)
     {
-      exercise = "Plank Tap";
+      exercise = "6";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 7)
     {
-      exercise = "Lunge";
+      exercise = "7";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 8)
     {
-      exercise = "Squat";
+      exercise = "8";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 9)
     {
-      exercise = "Squat Jump";
+      exercise = "9";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 10)
     {
-      exercise = "Running";
+      exercise = "10";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 11)
     {
-      exercise = "Walking";
+      exercise = "11";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 12)
     {
-      exercise = "Sitting";
+      exercise = "12";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 13)
     {
-      exercise = "Standing";
+      exercise = "13";
       digitalWrite(LED_PIN, HIGH);
     }
     else if (c == 14)
     {
-      exercise = "No Class";
+      exercise = "14";
       digitalWrite(LED_PIN, LOW);
     }
     else
