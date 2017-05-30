@@ -73,6 +73,10 @@ int exercise = 99;
 #define LED_PIN 13
 int userNumber = 100;
 
+// Timing init
+int startTime;
+int endTime;
+
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
 // is used in I2Cdev.h
@@ -183,6 +187,8 @@ uint8_t i=0; // reset for SD Card logging
 
 void loop() {
 
+startTime = millis();
+
 // labeling with mobile app
  int c;
   if (Serial1.available()) {
@@ -291,5 +297,12 @@ if (readData)
     // blink LED to indicate activity
     blinkState = !blinkState;
     digitalWrite(LED_PIN, blinkState);
-    //delay(100);
+
+endTime = millis();
+
+if (endTime - startTime < 33)
+{
+  delay(33 - (endTime - startTime));
+}
+    
 }
