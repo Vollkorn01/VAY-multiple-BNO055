@@ -51,7 +51,14 @@ Please note that you must use a HM-10 compatible module for this example to work
 	<p id="info">Initializing...</p>
 
 	<button class="green wide" onclick="app.connect()">CONNECT</button>
+	
+	<h2>Enter User Number</h2>
 
+	<input id="usernumber" value="" type="number" />
+	<br/>
+	<button class="green" onclick="app.userNumber()">SEND</button>
+	<br />
+	
 	<input type="radio" id="Label0" name="lightButton"
 		class="btn-group red wide" />
 	<label for="Label0" onclick="app.noClass()">0 NO CLASS</label>
@@ -107,6 +114,11 @@ Please note that you must use a HM-10 compatible module for this example to work
 	// Connected device.
 	app.device = null;
 
+		// Send User Number.
+	app.userNumber = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([250-$('#usernumber').val()]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
 	
 		// Track No CLASS.
 	app.noClass = function()

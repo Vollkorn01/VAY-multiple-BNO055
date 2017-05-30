@@ -69,8 +69,9 @@ bool readData = false;
 int flushcount = 0;
 
 // Labeling Initialization
-String exercise = "Not Def";
+int exercise = 99;
 #define LED_PIN 13
+int userNumber = 100;
 
 
 // Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
@@ -175,6 +176,11 @@ delay(2000);
 
 uint8_t i=0; // reset for SD Card logging
 
+
+
+// Loop
+//----------------------------------------------------------------------------------
+
 void loop() {
 
 // labeling with mobile app
@@ -182,103 +188,30 @@ void loop() {
   if (Serial1.available()) {
     c = Serial1.read();  
     //Serial.print(c);
+
+    if (c > 150)
+    {
+      userNumber = 250 - c;
+    }
     
     if (c == 0)
     {
-      exercise = "0";
+      exercise = 0;
       digitalWrite(LED_PIN, HIGH);
       readData = false;
     }
-    if (c == 1)
-    {
-      exercise = "1";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 2)
-    {
-      exercise = "2";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 3)
-    {
-      exercise = "3";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 4)
-    {
-      exercise = "4";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 5)
-    {
-      exercise = "5";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 6)
-    {
-      exercise = "6";
-      digitalWrite(LED_PIN, LOW);
-      readData = false;
-    }
-    else if (c == 7)
-    {
-      exercise = "7";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 8)
-    {
-      exercise = "8";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 9)
-    {
-      exercise = "9";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 10)
-    {
-      exercise = "10";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 11)
-    {
-      exercise = "11";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 12)
-    {
-      exercise = "12";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 13)
-    {
-      exercise = "13";
-      digitalWrite(LED_PIN, HIGH);
-      readData = true;
-    }
-    else if (c == 14)
-    {
-      exercise = "14";
-      digitalWrite(LED_PIN, LOW);
-      readData = true;
-    }
-
-    else
-    {
-      digitalWrite(LED_PIN, LOW);
-    }  
     
+    int i;
+    for (i = 1; i <15; i++)
+    {
+      if (c == i)
+      {
+        exercise = i;
+        digitalWrite(LED_PIN, HIGH);
+        readData = true;
+        break;
+      }
+    }
   }
  for (int t = 0; t < sensorNumber; t++)
    {
@@ -289,7 +222,7 @@ void loop() {
     //accelGyroMag.getAcceleration(&ax, &ay, &az);
     //accelGyroMag.getRotation(&gx, &gy, &gz);
 if (readData)
-{
+{ 
 #ifdef Adalogger
     // SD card logging
     digitalWrite(8, HIGH);
@@ -336,12 +269,14 @@ if (readData)
 {
 #ifdef SerialPrint
     Serial.print(millis()); Serial.print(",");
+    Serial.print(userNumber); Serial.print(",");
     Serial.print(exercise);
     Serial.println(";");
   #endif
   
 #ifdef Adalogger
     logfile.print(millis()); logfile.print(",");
+    logfile.print(userNumber); logfile.print(",");
     logfile.print(exercise);
     logfile.println(";");
     flushcount++;
