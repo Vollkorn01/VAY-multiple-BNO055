@@ -286,17 +286,16 @@ if (readData)
     logfile.print(exercise);
     logfile.println(";");
     flushcount++;
-    if (flushcount >= 90)
+    if (flushcount >= 30)
     {
     logfile.flush();
     flushcount = 0;
     }
    #endif
+// blink LED to indicate activity
+blinkState = !blinkState;
+digitalWrite(LED_PIN, blinkState);
 }
-    
-    // blink LED to indicate activity
-    blinkState = !blinkState;
-    digitalWrite(LED_PIN, blinkState);
 
 endTime = millis();
 
