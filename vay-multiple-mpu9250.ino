@@ -28,11 +28,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
+// define bluetooth output
+ #define BluetoothTransmit // uncomment this to not transmit via bluetooth
+
 // define Serial Output
 #define SerialPrint  // uncomment this to not print in serial monitor
 
 // define Bool to start logging
-bool readData = false;
+bool readData = true; // set to false to start logging only after receiving user number
 
 // SD Card Logger Init
 //---------------------------------------------
@@ -229,6 +232,21 @@ startTime = millis();
     //accelGyroMag.getRotation(&gx, &gy, &gz);
 if (readData)
 { 
+
+#ifdef bluetoothTransmit
+/*
+    Serial1.print(ax); Serial1.print(",");
+    Serial1.print(ay); Serial1.print(",");
+    Serial1.print(az); Serial1.print(",");
+    Serial1.print(gx); Serial1.print(",");
+    Serial1.print(gy); Serial1.print(",");
+    Serial1.print(gz); Serial1.print(",");
+    Serial1.print(int(mx)); Serial1.print(",");
+    Serial1.print(int(my)); Serial1.print(",");
+    Serial1.print(int(mz)); Serial1.print(",");
+    */
+  #endif
+
 #ifdef Adalogger
     // SD card logging
     digitalWrite(8, HIGH);
@@ -270,9 +288,19 @@ if (readData)
     for (int i=0; i<mag; i++)
         Serial.print("*"); 
         */
-   }
+}
+
+
 if (readData)
 {
+#ifdef BluetoothTransmit
+  Serial1.print(ax);
+    //Serial1.print(millis()); //Serial1.print(",");
+    //Serial1.print(userNumber); Serial1.print(",");
+    //Serial1.print(exercise);
+   // Serial1.println(";");
+  #endif
+  
 #ifdef SerialPrint
     Serial.print(millis()); Serial.print(",");
     Serial.print(userNumber); Serial.print(",");
