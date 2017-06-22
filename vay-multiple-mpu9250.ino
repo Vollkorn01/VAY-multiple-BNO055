@@ -35,11 +35,11 @@ THE SOFTWARE.
 //=============================================================================
 
 // README:
-// uncomment #define BluetoothTransmit and make bool readDate = false and change module to hc-05
+// uncomment #define BluetoothTransmit and make bool readDate = true and change module to hc-05
 // in order to stream data to smartphone
 
 // define bluetooth output
-//#define BluetoothTransmit // uncomment this to not transmit via bluetooth
+ #define BluetoothTransmit // uncomment this to not transmit via bluetooth
 
 // define Serial Output
 #define SerialPrint  // uncomment this to not print in serial monitor
@@ -48,7 +48,7 @@ THE SOFTWARE.
 #define Adalogger  // uncomment this to not print on sd card
 
 // define Bool to start logging (for data storing Application)
-  bool readData = false; // set to false to start logging only after receiving user number
+  bool readData = true; // set to false to start logging only after receiving user number
 
 // SD Card Logger Init
 //---------------------------------------------
@@ -134,7 +134,7 @@ delay(1000);
 //----------------------------------------------------------------------------------
 
   Serial.begin(115200);
-  Serial1.begin(9600);                                                                    //Added ifdef bluetoothtransmit to set serial1 baudrate depending if hm-11 or hc-05 bluetooth module is attached
+  Serial1.begin(38400);                                                                    //Added ifdef bluetoothtransmit to set serial1 baudrate depending if hm-11 or hc-05 bluetooth module is attached
 #ifdef BluetoothTransmit
   Serial1.begin(38400);
   #endif
@@ -294,7 +294,7 @@ if (readData)
     logfile.print(int(my)); logfile.print(",");
     logfile.print(int(mz)); logfile.print(",");
 
-    digitalWrite(8, HIGH);
+    digitalWrite(8, LOW);
   #endif
 
 #ifdef SerialPrint
