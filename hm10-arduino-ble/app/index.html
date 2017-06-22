@@ -65,7 +65,7 @@ Please note that you must use a HM-10 compatible module for this example to work
 	
 	<input type="radio" id="Label1" name="lightButton"
 		class="btn-group half blue" />
-	<label for="Label1" onclick="app.pushUp()">1 PUSH UP</label>
+	<label for="Label1" onclick="app.pushUp()">1 Push UP</label>
 	
 	<input type="radio" id="Label2" name="lightButton"
 		class="btn-group half blue" />
@@ -77,11 +77,11 @@ Please note that you must use a HM-10 compatible module for this example to work
 	
 	<input type="radio" id="Label4" name="lightButton"
 		class="btn-group half blue" />
-	<label for="Label4" onclick="app.plankTap()">4 PLANK TAP</label>
+	<label for="Label4" onclick="app.plankTap()">4 Arm Circle</label>
 	
 	<input type="radio" id="Label5" name="lightButton"
 		class="btn-group half blue" />
-	<label for="Label5" onclick="app.lunge()">5 LUNGE</label>
+	<label for="Label5" onclick="app.lunge()">5 Lunge</label>
 	
 	<input type="radio" id="Label6" name="lightButton"
 		class="btn-group half blue" />
@@ -89,7 +89,7 @@ Please note that you must use a HM-10 compatible module for this example to work
 	
 	<input type="radio" id="Label7" name="lightButton"
 		class="btn-group half blue" />
-	<label for="Label7" onclick="app.squatJump()">7 SQUAT JUMP</label>
+	<label for="Label7" onclick="app.layingBack()">7 JUMP JACK</label>
 	
 	<input type="radio" id="Label8" name="lightButton"
 		class="btn-group half blue" />
@@ -106,6 +106,18 @@ Please note that you must use a HM-10 compatible module for this example to work
 	<input type="radio" id="Label11" name="lightButton"
 		class="btn-group half blue" />
 	<label for="Label11" onclick="app.standing()">11 STANDING</label>
+	
+	<input type="radio" id="Label12" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label12" onclick="app.layingBack()">12 LAY BACK</label>
+	
+	<input type="radio" id="Label13" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label13" onclick="app.sprinter()">13 Sprinter</label>
+	
+	<input type="radio" id="Label14" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label13" onclick="app.sidePlank()">14 SIDE PLANK</label>
 
 	<script>
 	// Application object.
@@ -144,7 +156,7 @@ Please note that you must use a HM-10 compatible module for this example to work
 		app.device && app.device.writeDataArray(new Uint8Array([3]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
-		// Track Plank Tap.
+		// Track Arm Circle (was plank tap).
 	app.plankTap = function()
 	{
 		app.device && app.device.writeDataArray(new Uint8Array([4]), '0000ffe1-0000-1000-8000-00805f9b34fb');
@@ -162,20 +174,20 @@ Please note that you must use a HM-10 compatible module for this example to work
 		app.device && app.device.writeDataArray(new Uint8Array([6]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
-		// Track Squat Jump.
+		// Track Jumping Jack.
 	app.squatJump = function()
 	{
 		app.device && app.device.writeDataArray(new Uint8Array([7]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
-		// Track Running.
-	app.running = function()
+		// Track Walking.
+	app.walking = function()
 	{
 		app.device && app.device.writeDataArray(new Uint8Array([8]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
-		// Track Walking
-	app.walking = function()
+		// Track Running
+	app.running = function()
 	{
 		app.device && app.device.writeDataArray(new Uint8Array([9]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
@@ -190,6 +202,24 @@ Please note that you must use a HM-10 compatible module for this example to work
 	app.standing = function()
 	{
 		app.device && app.device.writeDataArray(new Uint8Array([11]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Laying Back
+	app.layingBack = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([12]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Sprinter
+	app.sprinter = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([13]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Side Plank
+	app.sidePlank = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([14]), '0000ffe1-0000-1000-8000-00805f9b34fb');
 	}
 	
 

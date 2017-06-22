@@ -34,6 +34,10 @@ THE SOFTWARE.
 //                            DEFINING OUTPUTS
 //=============================================================================
 
+// README:
+// uncomment #define BluetoothTransmit and make bool readDate = false and change module to hc-05
+// in order to stream data to smartphone
+
 // define bluetooth output
 //#define BluetoothTransmit // uncomment this to not transmit via bluetooth
 
@@ -44,7 +48,7 @@ THE SOFTWARE.
 #define Adalogger  // uncomment this to not print on sd card
 
 // define Bool to start logging (for data storing Application)
-bool readData = false; // set to false to start logging only after receiving user number
+  bool readData = false; // set to false to start logging only after receiving user number
 
 // SD Card Logger Init
 //---------------------------------------------
@@ -245,6 +249,25 @@ if (readData)
 { 
 
 #ifdef BluetoothTransmit
+    Serial1.write(lowByte(ax));
+    Serial1.write(highByte(ax));
+    Serial1.write(lowByte(ay));
+    Serial1.write(highByte(ay));
+    Serial1.write(lowByte(az));
+    Serial1.write(highByte(az));
+    Serial1.write(lowByte(gx));
+    Serial1.write(highByte(gx));
+    Serial1.write(lowByte(gy));
+    Serial1.write(highByte(gy));
+    Serial1.write(lowByte(gz));
+    Serial1.write(highByte(gz));
+    Serial1.write(lowByte(int(mx)));
+    Serial1.write(highByte(int(mx)));
+    Serial1.write(lowByte(int(my)));
+    Serial1.write(highByte(int(my)));
+    Serial1.write(lowByte(int(mz)));
+    Serial1.write(highByte(int(mz)));
+
 /*
     Serial1.write(ax); //Serial1.write(",");
     Serial1.write(ay); //Serial1.write(",");
@@ -305,19 +328,17 @@ if (readData)
 if (readData)
 {
 #ifdef BluetoothTransmit
-
+/*
     for (int i = 1; i <=45; i++)
     {
       Serial1.write(lowByte(i));
       Serial1.write(highByte(i));
     }
-    /*
-    SENDING 16bit ints as two bytes
-    int16_t value = 1240;
-    
-    Serial1.write(lowByte(value));
-    Serial1.write(highByte(value));
-    */
+*/    
+    Serial1.write(-1);
+    Serial1.write(-1);
+    Serial1.write(-1);
+
     //Serial1.write(millis()); 
     //Serial1.print(",");
     //Serial1.print(userNumber); Serial1.print(",");
