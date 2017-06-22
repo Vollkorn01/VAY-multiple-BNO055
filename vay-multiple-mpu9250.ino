@@ -28,21 +28,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
+
+
+//=============================================================================
+//                            DEFINING OUTPUTS
+//=============================================================================
+
 // define bluetooth output
- #define BluetoothTransmit // uncomment this to not transmit via bluetooth
+//#define BluetoothTransmit // uncomment this to not transmit via bluetooth
 
 // define Serial Output
 #define SerialPrint  // uncomment this to not print in serial monitor
 
-// define Bool to start logging
-bool readData = true; // set to false to start logging only after receiving user number
+// define SD Card Logger
+#define Adalogger  // uncomment this to not print on sd card
+
+// define Bool to start logging (for data storing Application)
+bool readData = false; // set to false to start logging only after receiving user number
 
 // SD Card Logger Init
 //---------------------------------------------
-
-// define SD Card Logger
- #define Adalogger  // uncomment this to not print on sd card
-
 
 #ifdef Adalogger
 
@@ -51,7 +56,6 @@ bool readData = true; // set to false to start logging only after receiving user
   
   // Set the pins used
   #define cardSelect 4
-
   File logfile;
   // blink out an error code
   void error(uint8_t errno) {
@@ -115,14 +119,21 @@ void tcaselect(uint8_t i) {
 #define LED_PIN 13
 bool blinkState = false;
 
+//=============================================================================
+//                                   SETUP
+//=============================================================================
+
 void setup() {
-delay(2000);
+delay(1000);
 
 // SD Card Logger Setup
 //----------------------------------------------------------------------------------
 
   Serial.begin(115200);
-  Serial1.begin(9600);
+  Serial1.begin(9600);                                                                    //Added ifdef bluetoothtransmit to set serial1 baudrate depending if hm-11 or hc-05 bluetooth module is attached
+#ifdef BluetoothTransmit
+  Serial1.begin(38400);
+  #endif
   Serial.println("\r\nAnalog logger test");
   pinMode(13, OUTPUT);
 
@@ -184,9 +195,9 @@ delay(2000);
 uint8_t i=0; // reset for SD Card logging
 
 
-
-// Loop
-//----------------------------------------------------------------------------------
+//=============================================================================
+//                                   LOOP
+//=============================================================================
 
 void loop() {
 
@@ -196,7 +207,7 @@ startTime = millis();
  int c;
   if (Serial1.available()) {
     c = Serial1.read();  
-    //Serial.print(c);
+    Serial.print(c);
 
     if (c > 150)
     {
@@ -233,17 +244,17 @@ startTime = millis();
 if (readData)
 { 
 
-#ifdef bluetoothTransmit
+#ifdef BluetoothTransmit
 /*
-    Serial1.print(ax); Serial1.print(",");
-    Serial1.print(ay); Serial1.print(",");
-    Serial1.print(az); Serial1.print(",");
-    Serial1.print(gx); Serial1.print(",");
-    Serial1.print(gy); Serial1.print(",");
-    Serial1.print(gz); Serial1.print(",");
-    Serial1.print(int(mx)); Serial1.print(",");
-    Serial1.print(int(my)); Serial1.print(",");
-    Serial1.print(int(mz)); Serial1.print(",");
+    Serial1.write(ax); //Serial1.write(",");
+    Serial1.write(ay); //Serial1.write(",");
+    Serial1.write(az); //Serial1.write(",");
+    Serial1.write(gx); //Serial1.write(",");
+    Serial1.write(gy); //Serial1.write(",");
+    Serial1.write(gz); //Serial1.write(",");
+    Serial1.write(int(mx)); //Serial1.write(",");
+    Serial1.write(int(my)); //Serial1.write(",");
+    Serial1.write(int(mz)); //Serial1.write(",");
     */
   #endif
 
@@ -260,7 +271,7 @@ if (readData)
     logfile.print(int(my)); logfile.print(",");
     logfile.print(int(mz)); logfile.print(",");
 
-    digitalWrite(8, LOW);
+    digitalWrite(8, HIGH);
   #endif
 
 #ifdef SerialPrint
@@ -294,20 +305,33 @@ if (readData)
 if (readData)
 {
 #ifdef BluetoothTransmit
-  Serial1.print(ax);
-    //Serial1.print(millis()); //Serial1.print(",");
+
+    for (int i = 1; i <=45; i++)
+    {
+      Serial1.write(lowByte(i));
+      Serial1.write(highByte(i));
+    }
+    /*
+    SENDING 16bit ints as two bytes
+    int16_t value = 1240;
+    
+    Serial1.write(lowByte(value));
+    Serial1.write(highByte(value));
+    */
+    //Serial1.write(millis()); 
+    //Serial1.print(",");
     //Serial1.print(userNumber); Serial1.print(",");
     //Serial1.print(exercise);
-   // Serial1.println(";");
+    //Serial1.println();
   #endif
-  
+
 #ifdef SerialPrint
     Serial.print(millis()); Serial.print(",");
     Serial.print(userNumber); Serial.print(",");
     Serial.print(exercise);
     Serial.println(";");
   #endif
-  
+
 #ifdef Adalogger
     logfile.print(millis()); logfile.print(",");
     logfile.print(userNumber); logfile.print(",");
@@ -319,17 +343,15 @@ if (readData)
     logfile.flush();
     flushcount = 0;
     }
-   #endif
+  #endif
 // blink LED to indicate activity
 blinkState = !blinkState;
 digitalWrite(LED_PIN, blinkState);
 }
 
-endTime = millis();
-
+endTime = millis();  // THIS DOESNT NECESSARILY MAKES SENSE -> DATAPOINTS ARENT LINEARLY DISTRIBUTED
 if (endTime - startTime < 33)
 {
   delay(33 - (endTime - startTime));
 }
-    
 }
