@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<!--
+This is an app that demonstrates how to control an Arduio board
+using BLE (Bluetooth Low Energy).
+Please note that you must use a HM-10 compatible module for this example to work.
+-->
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>HM-10 and Arduino LED On/Off BLE</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	window.onerror = function(msg, url, line)
+	{
+		console.log(msg + ": " + url + ":" + line);
+	};
+	</script>
+
+	<script src="cordova.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="libs/evothings/arduinoble/arduinoble.js"></script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+	<header>
+		<button class="back" onclick="history.back()">
+			<img src="ui/images/arrow-left.svg" />
+		</button>
+
+		<img class="logotype" src="ui/images/VAY-logo.svg" alt="VAY-logo" />
+
+		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
+	</header>
+
+	<h1>ACTIVITY TRACKER</h1>
+
+	<p id="info">Initializing...</p>
+
+	<button class="green wide" onclick="app.connect()">CONNECT</button>
+	
+	<h2>Enter User Number</h2>
+
+	<input id="usernumber" value="" type="number" />
+	<br/>
+	<button class="green" onclick="app.userNumber()">SEND</button>
+	<br />
+	
+	<input type="radio" id="Label0" name="lightButton"
+		class="btn-group yellow wide" />
+	<label for="Label0" onclick="app.noClass()">0 NO CLASS</label>
+	
+	<input type="radio" id="Label1" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label1" onclick="app.pushUp()">1 Push UP</label>
+	
+	<input type="radio" id="Label2" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label2" onclick="app.sitUp()">2 SIT UP</label>
+	
+	<input type="radio" id="Label3" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label3" onclick="app.plank()">3 PLANK</label>
+	
+	<input type="radio" id="Label4" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label4" onclick="app.plankTap()">4 Arm Circle</label>
+	
+	<input type="radio" id="Label5" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label5" onclick="app.lunge()">5 Lunge</label>
+	
+	<input type="radio" id="Label6" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label6" onclick="app.squat()">6 SQUAT</label>
+	
+	<input type="radio" id="Label7" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label7" onclick="app.squatJump()">7 JUMP JACK</label>
+	
+	<input type="radio" id="Label8" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label8" onclick="app.walking()">8 WALKING</label>
+	
+	<input type="radio" id="Label9" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label9" onclick="app.running()">9 RUNNING</label>
+	
+	<input type="radio" id="Label10" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label10" onclick="app.sitting()">10 SITTING</label>
+	
+	<input type="radio" id="Label11" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label11" onclick="app.standing()">11 STANDING</label>
+	
+	<input type="radio" id="Label12" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label12" onclick="app.layingBack()">12 LAY BACK</label>
+	
+	<input type="radio" id="Label13" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label13" onclick="app.sprinter()">13 Sprinter</label>
+	
+	<input type="radio" id="Label14" name="lightButton"
+		class="btn-group half blue" />
+	<label for="Label14" onclick="app.sidePlank()">14 SIDE PLANK</label>
+	
+	<input type="radio" id="Label15" name="lightButton"
+		class="btn-group wide red" />
+	<label for="Label15" onclick="app.error()">15 ERROR</label>
+	
+
+	<script>
+	// Application object.
+	var app = {}
+
+	// Connected device.
+	app.device = null;
+
+		// Send User Number.
+	app.userNumber = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([250-$('#usernumber').val()]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track No CLASS.
+	app.noClass = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([0]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+	// Track Push Ups.
+	app.pushUp = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([1]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Sit Up.
+	app.sitUp = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([2]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Plank.
+	app.plank = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([3]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Arm Circle (was plank tap).
+	app.plankTap = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([4]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Lunge.
+	app.lunge = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([5]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Squat.
+	app.squat = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([6]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Jumping Jack.
+	app.squatJump = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([7]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Walking.
+	app.walking = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([8]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Running
+	app.running = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([9]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Sitting
+	app.sitting = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([10]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Standing
+	app.standing = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([11]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Laying Back
+	app.layingBack = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([12]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Sprinter
+	app.sprinter = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([13]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Side Plank
+	app.sidePlank = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([14]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+		// Track Error
+	app.error = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([15]), '0000ffe1-0000-1000-8000-00805f9b34fb');
+	}
+	
+
+	app.showMessage = function(info)
+	{
+		document.getElementById('info').innerHTML = info
+	};
+
+	// Called when BLE and other native functions are available.
+	app.onDeviceReady = function()
+	{
+		app.showMessage('Touch the connect button to begin.');
+	};
+
+	app.connect = function()
+	{
+		evothings.arduinoble.close();
+
+		evothings.arduinoble.connect(
+			'CC41-A', // Name of the module.
+			function(device)
+			{
+				app.device = device;
+				app.showMessage('Connected!');
+			},
+			function(errorCode)
+			{
+				app.showMessage('Connect error: ' + errorCode + '.');
+			});
+	};
+
+	document.addEventListener(
+		'deviceready',
+		function() { evothings.scriptsLoaded(app.onDeviceReady) },
+		false);
+	</script>
+
+</body>
+
+</html>

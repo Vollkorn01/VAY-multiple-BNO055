@@ -45,10 +45,10 @@ THE SOFTWARE.
 #define SerialPrint  // uncomment this to not print in serial monitor
 
 // define SD Card Logger
-//#define Adalogger  // uncomment this to not print on sd card
+#define Adalogger  // uncomment this to not print on sd card
 
 // define Bool to start logging (for data storing Application)
-  bool readData = true; // starts logging directly after powerin up
+  bool readData = false; // starts logging directly after powerin gup
 
 // SD Card Logger Init
 //---------------------------------------------
@@ -89,20 +89,33 @@ int startTime;
 int endTime;
 
 
-#include <Wire.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
+// Arduino Wire library is required if I2Cdev I2CDEV_ARDUINO_WIRE implementation
+// is used in I2Cdev.h
+#include "Wire.h"
 
-Adafruit_BNO055 bno = Adafruit_BNO055();
+// I2Cdev and MPU9150 must be installed as libraries, or else the .cpp/.h files
+// for both classes must be in the include path of your project
+#include "I2Cdev.h"
+#include "MPU9150.h"
+#include "helper_3dmath.h"
+
+// class default I2C address is 0x68
+// specific I2C addresses may be passed as a parameter here
+// AD0 low = 0x68 (default for InvenSense evaluation board)
+// AD0 high = 0x69
+MPU9150 accelGyroMag;
+
+int16_t ax, ay, az;
+int16_t gx, gy, gz;
+int16_t mx, my, mz;
 
 // i2xmux init
-#define MPU_addr 0x29
+#define MPU_addr 0x68
 #define TCAADDR 0x70
 
-int sensorNumber = 2;
+int sensorNumber = 5;
 void tcaselect(uint8_t i) {
-  if (i > 1) return; 
+  if (i > 7) return; 
   Wire.beginTransmission(TCAADDR);
   Wire.write(1 << i);
   Wire.endTransmission(); 
@@ -115,32 +128,21 @@ bool blinkState = false;
 //=============================================================================
 
 void setup() {
-
-  Serial.begin(115200);
-  Serial1.begin(9600);
-
-// BNO055 Sensor initialization
-//----------------------------------------------------------------------------------
-  // i2c mux initialization
- for (int t = 0; t < sensorNumber; t++)
-   {
-    tcaselect(t);
-  if(!bno.begin())
-  {
-    /* There was a problem detecting the BNO055 ... check your connections */
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
-    delay(500);
-    bno.setExtCrystalUse(true); // maybe only used to get calibraiton status
-  }
-}
-
+delay(1000);
 
 // SD Card Logger Setup
 //----------------------------------------------------------------------------------
 
-Serial.println("\r\nAnalog logger test");
-  
+  Serial.begin(115200);
+  Serial1.begin(9600);                                                               
+/*
+#ifdef BluetoothTransmit
+  Serial1.begin(38400);
+  #endif
+ */
+  Serial.println("\r\nAnalog logger test");
+  pinMode(13, OUTPUT);
+
 #ifdef Adalogger
   // see if the card is present and can be initialized:
   if (!SD.begin(cardSelect)) {
@@ -167,12 +169,32 @@ Serial.println("\r\nAnalog logger test");
   Serial.print("Writing to "); 
   Serial.println(filename);
 
+  pinMode(13, OUTPUT);
   pinMode(8, OUTPUT);
   Serial.println("Ready!");
 #endif
-   
-// configure Arduino LED for
-pinMode(LED_PIN, OUTPUT);
+    // join I2C bus (I2Cdev library doesn't do this automatically)
+    Wire.begin();
+    for(int x = 0; x < sensorNumber; x++)
+    {
+          tcaselect(x); // make a loop for all sensors here!
+      Wire.beginTransmission(MPU_addr);
+      Wire.write(0x6B);  // PWR_MGMT_1 register
+      Wire.write(0);     // set to zero (wakes up the MPU-6050)
+      Wire.endTransmission(true);
+      accelGyroMag.enableMag();
+    }
+  
+    // initialize device
+    Serial.println("Initializing I2C devices...");
+    accelGyroMag.initialize();
+
+    // verify connection
+    Serial.println("Testing device connections...");
+    Serial.println(accelGyroMag.testConnection() ? "MPU9150 connection successful" : "MPU9150 connection failed");
+
+    // configure Arduino LED for
+    pinMode(LED_PIN, OUTPUT);
 
 }
 
@@ -206,7 +228,7 @@ startTime = millis();
     }
     
     int i;
-    for (i = 1; i <15; i++)
+    for (i = 1; i <17; i++)
     {
       if (c == i)
       {
@@ -217,39 +239,91 @@ startTime = millis();
       }
     }
   }
-  // i2c mux initialization
  for (int t = 0; t < sensorNumber; t++)
    {
     tcaselect(t);
-    
+    // read raw accel/gyro/mag measurements from device
+    accelGyroMag.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);  // or     accelGyroMag.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
+    //these methods (and a few others) are also available
+    //accelGyroMag.getAcceleration(&ax, &ay, &az);
+    //accelGyroMag.getRotation(&gx, &gy, &gz);
 if (readData)
 { 
 
 #ifdef BluetoothTransmit
+    Serial1.write(lowByte(ax));
+    Serial1.write(highByte(ax));
+    Serial1.write(lowByte(ay));
+    Serial1.write(highByte(ay));
+    Serial1.write(lowByte(az));
+    Serial1.write(highByte(az));
+    Serial1.write(lowByte(gx));
+    Serial1.write(highByte(gx));
+    Serial1.write(lowByte(gy));
+    Serial1.write(highByte(gy));
+    Serial1.write(lowByte(gz));
+    Serial1.write(highByte(gz));
+    Serial1.write(lowByte(int(mx)));
+    Serial1.write(highByte(int(mx)));
+    Serial1.write(lowByte(int(my)));
+    Serial1.write(highByte(int(my)));
+    Serial1.write(lowByte(int(mz)));
+    Serial1.write(highByte(int(mz)));
 
+/*
+    Serial1.write(ax); //Serial1.write(",");
+    Serial1.write(ay); //Serial1.write(",");
+    Serial1.write(az); //Serial1.write(",");
+    Serial1.write(gx); //Serial1.write(",");
+    Serial1.write(gy); //Serial1.write(",");
+    Serial1.write(gz); //Serial1.write(",");
+    Serial1.write(int(mx)); //Serial1.write(",");
+    Serial1.write(int(my)); //Serial1.write(",");
+    Serial1.write(int(mz)); //Serial1.write(",");
+    */
   #endif
 
 #ifdef Adalogger
     // SD card logging
     digitalWrite(8, HIGH);
+    logfile.print(ax); logfile.print(",");
+    logfile.print(ay); logfile.print(",");
+    logfile.print(az); logfile.print(",");
+    logfile.print(gx); logfile.print(",");
+    logfile.print(gy); logfile.print(",");
+    logfile.print(gz); logfile.print(",");
+    logfile.print(int(mx)); logfile.print(",");
+    logfile.print(int(my)); logfile.print(",");
+    logfile.print(int(mz)); logfile.print(",");
 
     digitalWrite(8, LOW);
   #endif
 
 #ifdef SerialPrint
-  // display quaternions
-  imu::Quaternion quat = bno.getQuat();
-  Serial.print("qW: ");
-  Serial.print(quat.w(), 4);
-  Serial.print(" qX: ");
-  Serial.print(quat.y(), 4);
-  Serial.print(" qY: ");
-  Serial.print(quat.x(), 4);
-  Serial.print(" qZ: ");
-  Serial.print(quat.z(), 4);
-  Serial.print("\t\t");
+    // display tab-separated accel/gyro/mag x/y/z values
+    Serial.print("a/g/m:\t");
+    Serial.print(ax); Serial.print("\t");
+    Serial.print(ay); Serial.print("\t");
+    Serial.print(az); Serial.print("\t");
+    Serial.print(gx); Serial.print("\t");
+    Serial.print(gy); Serial.print("\t");
+    Serial.print(gz); Serial.print("\t");
+    Serial.print(int(mx)); Serial.print("\t");
+    Serial.print(int(my)); Serial.print("\t");
+    Serial.print(int(mz)); Serial.print("\t");
   #endif
 }
+
+/*
+    const float N = 256;
+    float mag = mx*mx/N + my*my/N + mz*mz/N;
+    Serial.print(mag); Serial.print("\t");
+    logfile.print(mag); logfile.print("\t");
+*/
+    /*
+    for (int i=0; i<mag; i++)
+        Serial.print("*"); 
+        */
 }
 
 
@@ -275,11 +349,9 @@ if (readData)
   #endif
 
 #ifdef SerialPrint
-/*
     Serial.print(millis()); Serial.print(",");
     Serial.print(userNumber); Serial.print(",");
     Serial.print(exercise);
-    */
     Serial.println(";");
   #endif
 
@@ -300,7 +372,7 @@ blinkState = !blinkState;
 digitalWrite(LED_PIN, blinkState);
 }
 
-endTime = millis();  // THIS DOESNT NECESSARILY MAKE SENSE -> DATAPOINTS ARENT LINEARLY DISTRIBUTED
+endTime = millis();  // THIS DOESNT NECESSARILY MAKES SENSE -> DATAPOINTS ARENT LINEARLY DISTRIBUTED
 if (endTime - startTime < 33)
 {
   delay(33 - (endTime - startTime));
