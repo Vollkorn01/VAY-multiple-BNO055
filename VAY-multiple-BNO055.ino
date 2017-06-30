@@ -33,6 +33,7 @@ THE SOFTWARE.
 //=============================================================================
 //                            DEFINING OUTPUTS
 //=============================================================================
+//
 
 // README:
 // uncomment #define BluetoothTransmit, make bool readDate = true, change baudrate of serial1 to 38400
@@ -42,13 +43,13 @@ THE SOFTWARE.
 //#define BluetoothTransmit // uncomment this to not transmit via bluetooth
 
 // define Serial Output
-#define SerialPrint  // uncomment this to not print in serial monitor
+//#define SerialPrint  // uncomment this to not print in serial monitor
 
 // define SD Card Logger
-//#define Adalogger  // uncomment this to not print on sd card
+#define Adalogger  // uncomment this to not print on sd card
 
-// define Bool to start logging (for data storing Application)
-  bool readData = true; // starts logging directly after powerin up
+// starts logging / streaming when receiving start signal from App
+  bool readData = true;
 
 // SD Card Logger Init
 //---------------------------------------------
@@ -88,13 +89,15 @@ int userNumber = 100;
 int startTime;
 int endTime;
 
-
+//BNO055 Sensor init
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
+int qw, qy, qx, qz;
+
 
 // i2xmux init
 //#define MPU_addr 0x29
@@ -116,8 +119,12 @@ bool blinkState = false;
 
 void setup() {
 
+
+// SD Card Logger Setup
+//----------------------------------------------------------------------------------
+
   Serial.begin(115200);
-  Serial1.begin(38400);
+  Serial1.begin(38400);   
   Wire.begin();
 
 // BNO055 Sensor initialization
@@ -139,9 +146,9 @@ void setup() {
 
 // SD Card Logger Setup
 //----------------------------------------------------------------------------------
+                                                           
+  Serial.println("\r\nAnalog logger test");
 
-Serial.println("\r\nAnalog logger test");
-  
 #ifdef Adalogger
   // see if the card is present and can be initialized:
   if (!SD.begin(cardSelect)) {
@@ -167,13 +174,12 @@ Serial.println("\r\nAnalog logger test");
   }
   Serial.print("Writing to "); 
   Serial.println(filename);
-
   pinMode(8, OUTPUT);
   Serial.println("Ready!");
 #endif
-   
-// configure Arduino LED for
-pinMode(LED_PIN, OUTPUT);
+    
+    // configure Arduino LED for
+    pinMode(LED_PIN, OUTPUT);
 
 }
 
@@ -185,7 +191,6 @@ uint8_t i=0; // reset for SD Card logging
 //=============================================================================
 
 void loop() {
-
 startTime = millis();
 
 // labeling with mobile app
@@ -194,6 +199,13 @@ startTime = millis();
     c = Serial1.read();  
     Serial.print(c);
 
+// start sending data when receiving a 255
+
+    if (c == 255)
+    {
+      readData = true;
+    }
+    
     if (c > 150)
     {
       userNumber = 250 - c;
@@ -207,7 +219,7 @@ startTime = millis();
     }
     
     int i;
-    for (i = 1; i <15; i++)
+    for (i = 1; i <17; i++)
     {
       if (c == i)
       {
@@ -218,57 +230,57 @@ startTime = millis();
       }
     }
   }
-  // i2c mux readout
  for (int t = 0; t < sensorNumber; t++)
    {
     tcaselect(t);
-    
+
 if (readData)
 { 
+imu::Quaternion quat = bno.getQuat();
+qw = quat.w()*1000;
+qy = quat.y()*1000;
+qx = quat.x()*1000;
+qz = quat.z()*1000;
 
 #ifdef BluetoothTransmit
     digitalWrite(13, HIGH);
-    Serial1.write(81); //Serial1.write(",");
-    Serial1.write(82); //Serial1.write(",");
-    Serial1.write(83); //Serial1.write(",");
-    Serial1.write(84); //Serial1.write(",");
-    Serial1.write(85); //Serial1.write(",");
-    Serial1.write(86); //Serial1.write(",");
-    Serial1.write(87); //Serial1.write(",");
-    Serial1.write(88); //Serial1.write(",");
-    Serial1.write(89); //Serial1.write(",");
-    Serial1.write(90); //Serial1.write(",");
-    Serial1.write(91); //Serial1.write(",");
-    Serial1.write(92); //Serial1.write(",");
-    Serial1.write(93); //Serial1.write(",");
-    Serial1.write(94); //Serial1.write(",");
-    Serial1.write(95); //Serial1.write(",");
-    Serial1.write(96); //Serial1.write(",");
-    Serial1.write(97); //Serial1.write(",");
-    Serial1.write(98); //Serial1.write(",");
+    Serial1.write(lowByte(qw);
+    Serial1.write(highByte(qw);
+    Serial1.write(lowByte(qy);
+    Serial1.write(highByte(qy);
+    Serial1.write(lowByte(qx);
+    Serial1.write(highByte(qx);
+    Serial1.write(lowByte(qz);
+    Serial1.write(highByte(qz);
     digitalWrite(13, LOW);
-    
+
   #endif
 
 #ifdef Adalogger
     // SD card logging
     digitalWrite(8, HIGH);
-
+    logfile.print(qw);
+    logfile.print(",");
+    logfile.print(qy);
+    logfile.print(",");
+    logfile.print(qx);
+    logfile.print(",");
+    logfile.print(qz);
+    logfile.print(",");
     digitalWrite(8, LOW);
   #endif
 
 #ifdef SerialPrint
-  // display quaternions
-  imu::Quaternion quat = bno.getQuat();
-  Serial.print("qW: ");
-  Serial.print(quat.w(), 4);
-  Serial.print(" qX: ");
-  Serial.print(quat.y(), 4);
-  Serial.print(" qY: ");
-  Serial.print(quat.x(), 4);
-  Serial.print(" qZ: ");
-  Serial.print(quat.z(), 4);
-  Serial.print("\t\t");
+    // display quaternions
+    Serial.print("qW: ");
+    Serial.print(qw);
+    Serial.print(" qX: ");
+    Serial.print(qy);
+    Serial.print(" qY: ");
+    Serial.print(qx);
+    Serial.print(" qZ: ");
+    Serial.print(qz);
+    Serial.print("\t\t");
   #endif
 }
 }
@@ -276,32 +288,15 @@ if (readData)
 
 if (readData)
 {
-#ifdef BluetoothTransmit
-/*
-    for (int i = 1; i <=45; i++)
-    {
-      Serial1.write(lowByte(i));
-      Serial1.write(highByte(i));
-    }
-*/    
-    Serial1.write(-1);
-    Serial1.write(-1);
-    Serial1.write(-1);
-
-    //Serial1.write(millis()); 
-    //Serial1.print(",");
-    //Serial1.print(userNumber); Serial1.print(",");
-    //Serial1.print(exercise);
-    //Serial1.println();
-  #endif
-
+  
 #ifdef SerialPrint
-/*
+    Serial.println();
+    /*
     Serial.print(millis()); Serial.print(",");
     Serial.print(userNumber); Serial.print(",");
     Serial.print(exercise);
-    */
     Serial.println(";");
+    */
   #endif
 
 #ifdef Adalogger
@@ -320,10 +315,11 @@ if (readData)
 blinkState = !blinkState;
 digitalWrite(LED_PIN, blinkState);
 }
-
-endTime = millis();  // THIS DOESNT NECESSARILY MAKE SENSE -> DATAPOINTS ARENT LINEARLY DISTRIBUTED
+/*
+endTime = millis();  // THIS DOESNT NECESSARILY MAKES SENSE -> DATAPOINTS ARENT LINEARLY DISTRIBUTED
 if (endTime - startTime < 33)
 {
   delay(33 - (endTime - startTime));
 }
+*/
 }
