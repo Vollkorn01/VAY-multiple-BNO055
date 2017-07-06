@@ -40,16 +40,16 @@ THE SOFTWARE.
 // and change module to hc-05 in order to stream data to smartphone
 
 // define bluetooth output
-//#define BluetoothTransmit // uncomment this to not transmit via bluetooth
+//#define BluetoothTransmit // uncomment this to transmit via bluetooth
 
 // define Serial Output
-//#define SerialPrint  // uncomment this to not print in serial monitor
+#define SerialPrint  // uncomment this to not print in serial monitor
 
 // define SD Card Logger
 #define Adalogger  // uncomment this to not print on sd card
 
 // starts logging / streaming when receiving start signal from App
-  bool readData = true;
+  bool readData = false;
 
 // SD Card Logger Init
 //---------------------------------------------
@@ -103,7 +103,7 @@ int qw, qy, qx, qz;
 //#define MPU_addr 0x29
 #define TCAADDR 0x70
 
-int sensorNumber = 3;
+int sensorNumber = 5;
 void tcaselect(uint8_t i) {
   if (i > 7) return; 
   Wire.beginTransmission(TCAADDR);
@@ -124,7 +124,7 @@ void setup() {
 //----------------------------------------------------------------------------------
 
   Serial.begin(115200);
-  Serial1.begin(38400);   
+  Serial1.begin(9600);   
   Wire.begin();
 
 // BNO055 Sensor initialization
@@ -180,6 +180,7 @@ void setup() {
     
     // configure Arduino LED for
     pinMode(LED_PIN, OUTPUT);
+    pinMode(LED_PIN, HIGH);
 
 }
 
@@ -229,6 +230,7 @@ startTime = millis();
         break;
       }
     }
+    delay(1000);
   }
  for (int t = 0; t < sensorNumber; t++)
    {
@@ -244,14 +246,14 @@ qz = quat.z()*1000;
 
 #ifdef BluetoothTransmit
     digitalWrite(13, HIGH);
-    Serial1.write(lowByte(qw);
-    Serial1.write(highByte(qw);
-    Serial1.write(lowByte(qy);
-    Serial1.write(highByte(qy);
-    Serial1.write(lowByte(qx);
-    Serial1.write(highByte(qx);
-    Serial1.write(lowByte(qz);
-    Serial1.write(highByte(qz);
+    Serial1.write(lowByte(qw));
+    Serial1.write(highByte(qw));
+    Serial1.write(lowByte(qy));
+    Serial1.write(highByte(qy));
+    Serial1.write(lowByte(qx));
+    Serial1.write(highByte(qx));
+    Serial1.write(lowByte(qz));
+    Serial1.write(highByte(qz));
     digitalWrite(13, LOW);
 
   #endif
@@ -272,15 +274,17 @@ qz = quat.z()*1000;
 
 #ifdef SerialPrint
     // display quaternions
-    Serial.print("qW: ");
-    Serial.print(qw);
-    Serial.print(" qX: ");
-    Serial.print(qy);
-    Serial.print(" qY: ");
-    Serial.print(qx);
-    Serial.print(" qZ: ");
-    Serial.print(qz);
-    Serial.print("\t\t");
+    Serial.print(quat.w(), 4);
+    Serial.print(",");
+    Serial.print(quat.y(), 4);
+    Serial.print(",");
+    Serial.print(quat.x(), 4);
+    Serial.print(",");
+    Serial.print(quat.z(), 4);
+    if (t == 0 || t == 1 || t == 2 || t == 3)
+    {
+      Serial.print(";");
+    }
   #endif
 }
 }
@@ -288,15 +292,11 @@ qz = quat.z()*1000;
 
 if (readData)
 {
-  
 #ifdef SerialPrint
-    Serial.println();
-    /*
     Serial.print(millis()); Serial.print(",");
     Serial.print(userNumber); Serial.print(",");
     Serial.print(exercise);
     Serial.println(";");
-    */
   #endif
 
 #ifdef Adalogger
